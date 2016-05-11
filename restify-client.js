@@ -1,5 +1,5 @@
-var util = require('util');
 var restify = require('restify');
+var util = require('util');
 
 var client = restify.createJsonClient({
   url: 'http://maps.google.com/'
@@ -8,7 +8,7 @@ var client = restify.createJsonClient({
 client.get('/maps/api/geocode/json?address=Moscow+Red+Square', 
   function (err, req, res, obj) {
     if (err)
-      console.error(err);
-    else
-      console.log(obj.results[0].formatted_address); 
+      throw new Error(err);
+
+    console.log(util.inspect(obj, {depth: null}));
   });

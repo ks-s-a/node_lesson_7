@@ -1,9 +1,8 @@
-var util = require('util');
 var restify = require('restify');
 
 var cars = [];
 
-rest = restify.createServer({
+var rest = restify.createServer({
   name: 'ProgSchool'
 });
 
@@ -33,107 +32,107 @@ rest.opts('.*', function(req, res, next) {
   } else {
     res.send(404); 
   }
-
-  return next();
 });
 
 rest.use(function(req, res, next) {
-  if (req.path().indexOf('/protected') !== -1) {
-    var auth = req.authorization;
-
-    if (auth.scheme == null) {
-      res.header('WWW-Authenticate', 'Basic realm="Please login"');
-      return res.send(401);
-    } 
-
-    console.log('login: ' + auth.basic.username);
-    console.log('password: ' + auth.basic.password);
-
-    // checking login and password
-
+  if (req.path().indexOf('/protected') === -1) {
     return next();
   }
+
+  var auth = req.authorization;
+  if (auth.scheme == null) {
+    res.header('WWW-Authenticate', 'Basic realm="Please login"');
+    return res.send(401);
+  } 
+
+  // console.log('login: ' + auth.basic.username);
+  // console.log('password: ' + auth.basic.password);
+
+  // checking login and password
 
   return next();
 });
 
 rest.get('/', function(req, res) {
-  res.send(200, {result: "OK"});
+  return res.send(200, {result: "OK"});
 });
 
 rest.get('/protected/cars', function (req, res) {
-  res.status(200);
-  res.send({
+  return res.send(200, {
     result: cars,
   });
 });
 
 rest.post('/protected/cars', function (req, res) {
-  if (req.params && req.params.type && req.params.brand) {
-    cars.push({
-      id: cars.length + 1,
-      type: req.params.type,
-      brand: req.params.brand,
-    });
-  } else {
-    res.status(404);
+  if (!req.params || !req.params.type || !req.params.brand) {
+    return res.send(404, {});
   }
+
+  cars.push({
+    id: cars.length + 1,
+    type: req.params.type,
+    brand: req.params.brand,
+  });
 
   res.status(200);
   res.send({result: 'ok!'});
 });
 
-rest.get('/protected/cars/:id', function (req, res, next) {
+rest.del('/protected/cars/:id', function (req, res) {
   var id = +req.params.id;
   var car = cars.filter(function (v) {
     return v.id === id;
   })[0];
 
-  // if (!id) {
-  //   res.status(200);
-  //   res.send({
-  //     result: cars,
-  //   });
-  // } 
-  if (!car) {
-    res.status(404);
-    return res.send('Нет такой машины!');
-  } else {
-    res.status(200);
-    res.send({
-      result: car
-    });
-  }
+  if (!car)
+    return res.send(404, 'Нет такой машины!');
+
+  cars = cars.filter(function(value) {
+    return value.id !== id;
+  });
+
+  return res.send(200, {
+    result: 'ok!',
+  });
 });
 
-rest.patch('/protected/cars/:id', function (req, res, next) {
-  if (!req.params.type || !req.params.brand) {
-    res.status(400);
-    return res.send('Некорректный запрос!');
-  }
+rest.get('/protected/cars/:id', function (req, res) {
+  var id = +req.params.id;
+  var car = cars.filter(function (v) {
+    return v.id === id;
+  })[0];
+ 
+  if (!car)
+    return res.send(404, 'Нет такой машины!');
+
+  res.send(200, {
+    result: car
+  });
+});
+
+rest.patch('/protected/cars/:id', function (req, res) {
+  if (!req.params.type || !req.params.brand)
+    return res.send(400, 'Некорректный запрос!');
 
   var id = +req.params.id;
-  var carIndex;
-  var car = cars.filter(function (v, i) {
-    if (v.id === id) {
+  var carIndex = -1;
+  cars.forEach(function (v, i) {
+    if (v.id === id)
       carIndex = i;
-      return true;
-    }
-    return false;
-  })[0];
+  });
 
-  if (!car) {
-    res.status(404);
-    return res.send('Нет такой машины!');
-  }
+  if (carIndex === -1)
+    return res.send(404, 'Нет такой машины!');
 
   cars[carIndex] = {
-    id: car.id,
+    id: id,
     type: req.params.type,
-    brand: req.params.brand
+    brand: req.params.brand,
   };
 
-  res.status(200);
+  return res.send(200, {
+    result: 'ok!',
+  });
 });
 
 rest.get('/redirect', function(req, res) {
