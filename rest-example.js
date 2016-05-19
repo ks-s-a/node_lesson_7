@@ -1,5 +1,8 @@
+// Пример RESTfull API
+
 var restify = require('restify');
 
+// Определяем коллекцию для хранения данных
 var cars = [];
 
 var rest = restify.createServer({
@@ -14,12 +17,14 @@ rest.get('/', function(req, res) {
   return res.send(200, {result: "OK"});
 });
 
+// Получаем данные о коллекции
 rest.get('/cars', function (req, res) {
   return res.send(200, {
     result: cars,
   });
 });
 
+// Создаем элемент в коллекции
 rest.post('/cars', function (req, res) {
   if (!req.params || !req.params.type || !req.params.brand)
     return res.send(400, {});
@@ -33,6 +38,7 @@ rest.post('/cars', function (req, res) {
   res.send(200, {result: 'ok!'});
 });
 
+// Удаляем элемент в коллекции
 rest.del('/cars/:id', function (req, res) {
   var id = +req.params.id;
   var car = cars.filter(function (v) {
@@ -51,6 +57,7 @@ rest.del('/cars/:id', function (req, res) {
   });
 });
 
+// Получаем информацию об элементе коллекции
 rest.get('/cars/:id', function (req, res) {
   var id = +req.params.id;
   var car = cars.filter(function (v) {
@@ -65,6 +72,7 @@ rest.get('/cars/:id', function (req, res) {
   });
 });
 
+// Изменяем информацию об элементе коллекции
 rest.patch('/cars/:id', function (req, res) {
   if (!req.params.type || !req.params.brand)
     return res.send(400, 'Некорректный запрос!');
