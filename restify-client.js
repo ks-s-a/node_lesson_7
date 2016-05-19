@@ -1,14 +1,13 @@
 var restify = require('restify');
-var util = require('util');
 
 var client = restify.createJsonClient({
-  url: 'http://maps.google.com/'
+  url: 'https://cars.mail.ru/bcache'
 });
 
-client.get('/maps/api/geocode/json?address=Moscow+Red+Square', 
+client.get('/sale/sale_wizard_form_controller_aj/?body_type=4&firm_id=98&price=300000-1200000&provoker=firm_id', 
   function (err, req, res, obj) {
     if (err)
       throw new Error(err);
 
-    console.log(util.inspect(obj, {depth: null}));
+    console.dir(obj, {depth: null});
   });
