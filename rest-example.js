@@ -73,7 +73,7 @@ rest.get('/cars/:id', function (req, res) {
 });
 
 // Изменяем информацию об элементе коллекции
-rest.patch('/cars/:id', function (req, res) {
+rest.put('/cars/:id', function (req, res) {
   if (!req.params.type || !req.params.brand)
     return res.send(400, 'Некорректный запрос!');
 
@@ -98,6 +98,6 @@ rest.patch('/cars/:id', function (req, res) {
   });
 });
 
-rest.listen(8080, function() {
-  console.log('API launched on 8080 port');
+rest.listen(8000, function() {
+  console.log('API launched on 8000 port');
 });

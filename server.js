@@ -21,7 +21,7 @@ rest.use(function(req, res, next) {
 
   // Проверяем авторизацию пользователя
   var auth = req.authorization;
-  if (auth.scheme == null) { // Не авторизован
+  if (!auth.scheme) { // Не авторизован
     // Предлагаем залогинится
     res.header('WWW-Authenticate', 'Basic realm="Please login"');
     return res.send(401);
@@ -55,6 +55,6 @@ rest.post('/protected/import', function(req, res) {
   res.send(200, {result: "imported!", data: req.params});
 });
 
-rest.listen(8080, function() {
-  console.log('API launched on 8080 port');
+rest.listen(8000, function() {
+  console.log('API launched on 8000 port');
 });
